@@ -1,32 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
+<html lang="zh-CN">
 
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
-            <form class="row" id="greet-form">
-                <input id="inputValue" placeholder="Enter a something..." />
-            </form>
-            <div class="resultBox">
-                <span>result: </span>
-                <span id="result"></span>
-            </div>
-            <div class="invokeBox">
-                <button id="openUrl">open_url_browser</button>
-                <button id="openUrlNew">open_url_new</button>
-                <button id="runCommand">run_command</button>
-                <button id="downloadFile">download_file</button>
-                <button id="getExeDir">get_exe_dir</button>
-                <button id="getEnvVar">get_env_var</button>
-                <button id="findPort">find_port</button>
-            </div>
-        </main>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>笔顺教学</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .iframe-container {
+      box-sizing: border-box;
+      padding: 20px;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    .iframe-container.mobile {
+      padding: 0;
+
+      .content-iframe {
+        border: transparent;
+        border-radius: 0;
+      }
+    }
+
+    .content-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      border: 0.5px solid #C9DACC;
+      border-radius: 16px;
+      position: relative;
+      background-color: #fff;
+      z-index: 2;
+    }
+
+    /* 田字格背景样式 */
+    .tianzige-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .tianzige-grid {
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to right, #ddd 1px, transparent 1px),
+        linear-gradient(to bottom, #ddd 1px, transparent 1px);
+      background-size: 50px 50px;
+      background-position: center center;
+      position: relative;
+    }
+
+    /* 田字格的中心十字线 */
+    .tianzige-grid::before,
+    .tianzige-grid::after {
+      content: '';
+      position: absolute;
+      background-color: #ff9999;
+      opacity: 0.5;
+    }
+
+    .tianzige-grid::before {
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      transform: translateY(-50%);
+    }
+
+    .tianzige-grid::after {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      transform: translateX(-50%);
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <!-- 田字格背景 -->
+  <div class="tianzige-container">
+    <div class="tianzige-grid"></div>
+  </div>
+  
+  <!-- 主要内容容器 -->
+  <div class="iframe-container">
+    <!-- 嵌入的iframe -->
+    <iframe class="content-iframe"
+      src="https://musk-online.fbcontent.cn/pub-musk-ai-studio/workflow/file/document/qXRuayYwfvTviVZydQGsFc.html"
+      frameborder="0">
+    </iframe>
+  </div>
+
+  <script>
+    const iframe = document.querySelector('.content-iframe');
+    if (iframe && iframe.contentWindow) {
+      function onError (e) {
+        // console.log('addEventListener iframe error', e.message)
+        e.preventDefault()
+        return false
+      }
+      function unhandledRejectionHandler (e) {
+        // console.log('unhandled rejection', e.reason)
+        e.preventDefault()
+        return false
+      }
+      iframe.contentWindow.addEventListener('error', onError)
+      iframe.contentWindow.addEventListener('unhandledrejection', unhandledRejectionHandler)
+      iframe.contentWindow.onError = () => {
+        return false
+      }
+      iframe.contentWindow.console.error = () => {}
+    }
+  </script>
+
+  <script>
+    function adjustRem () {
+      const pcBaseWidth = 375 // 设计稿
+      const width = document.documentElement.clientWidth
+      document.documentElement.style.fontSize = `${(width / pcBaseWidth * 100).toFixed(2)}px`
+    }
+
+    function getIsMobile () {
+      const width = document.documentElement.clientWidth
+      const isMobile = /Android|webOS|iPhone|iPod|BlackBerry|iPad|Windows Phone|Mobile/i.test(navigator.userAgent) || width <= 768
+      console.log('width', width, isMobile)
+      return isMobile
+    }
+
+    // 移动端检测和样式调整逻辑
+    function checkAndAdjustForMobile () {
+      const isMobile = getIsMobile()
+      if (isMobile) {
+        adjustRem()
+      }
+      const iframeContainer = document.querySelector('.iframe-container');
+
+      // 移动端时给iframe-container添加类名，否则移除类名
+      if (iframeContainer) {
+        if (isMobile) {
+          iframeContainer.classList.add('mobile');
+        } else {
+          iframeContainer.classList.remove('mobile');
+        }
+      }
+    }
+
+    function handleResize () {
+      // 响应式处理：重新检测移动端并处理样式调整
+      checkAndAdjustForMobile();
+    }
+
+    // 防止iframe内容溢出
+    window.addEventListener('resize', handleResize);
+
+    // 页面加载完成后执行移动端检测
+    document.addEventListener('DOMContentLoaded', checkAndAdjustForMobile);
+
+    // 清理所有事件绑定的函数
+    function clearAllEvents () {
+      // 清除 resize 事件监听器
+      window.removeEventListener('resize', handleResize);
+
+      // 清除 DOMContentLoaded 事件监听器
+      document.removeEventListener('DOMContentLoaded', checkAndAdjustForMobile);
+    }
+
+    // 页面卸载时自动清理事件（可选）
+    window.addEventListener('beforeunload', clearAllEvents);
+  </script>
+</body>
+
 </html>
